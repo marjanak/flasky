@@ -7,5 +7,11 @@ class Cat(db.Model):
     color:Mapped[str]
     personality:Mapped[str]
     
-
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            color=self.color,
+            personality=self.personality
+    )
     
