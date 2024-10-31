@@ -68,6 +68,8 @@ def delete_cat(cat_id):
     db.session.delete(cat)
     db.session.commit()
 
+    return Response(status=204, mimetype="application/json")
+
 def validate_cat(cat_id):
     try:
         cat_id = int(cat_id)
