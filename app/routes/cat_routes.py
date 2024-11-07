@@ -13,16 +13,14 @@ def create_cat():
     try:
         new_cat = Cat.from_dict(request_body)
         
-        response = new_cat.to_dict()
-        return response, 201
     except KeyError as e:
-        reponse = {"message": f"Invalid request:missing {e.args[0]}"}
+        response = {"message": f"Invalid request:missing {e.args[0]}"}
         abort(make_response(response, 400))
     db.session.add(new_cat)
     db.session.commit()
 
     reponse = new_cat.to_dict()
-    return respose,201
+    return response,201
 
 @bp.get("")
 def get_all_cats():
@@ -46,13 +44,13 @@ def get_all_cats():
 
 @bp.get("/<cat_id>")
 def get_single_cat(cat_id):
-    cat = validate_model(cat_id)
+    cat = validate_model(Cat, cat_id)
 
     return cat.to_dict()
 
 @bp.put("/<cat_id>")
 def update_cat(cat_id):
-    cat = validate_model(cat_id)
+    cat = validate_model(Cat, cat_id)
     request_body = request.get_json()
 
     cat.name = request_body["name"]
@@ -65,7 +63,7 @@ def update_cat(cat_id):
 
 @bp.delete("/<cat_id>")
 def delete_cat(cat_id):
-    cat = validate_model(cat_id)
+    cat = validate_model(Cat,cat_id)
 
     db.session.delete(cat)
     db.session.commit()

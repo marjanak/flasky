@@ -1,5 +1,7 @@
 from flask import Blueprint,request,abort,make_response
 from app.models.caretaker import Caretaker
+from .route_utilities import validate_model
+from app.models.cat import Cat
 from ..db import db
 
 bp = Blueprint("caretakers_bp", __name__, url_prefix="/caretakers")
@@ -11,8 +13,8 @@ def create_caretaker():
     try:
         new_caretaker = Caretaker.from_dict(request_body)
 
-    except KeyError as e:
-        response = {"message": f"Invalid request:missing {e.args[0]}"}
+    except KeyError as error:
+        response = {"message": f"Invalid request:missing {error.args[0]}"}
         abort(make_response(response, 400))
 
     db.session.add(new_caretaker)
@@ -32,3 +34,21 @@ def get_all_caretakers():
     caretakers_reponse = [caretaker.to_dict() for caretaker in caretakers]
 
     return caretakers_reponse
+
+@bp.post("/<caretaker_id>/cats")
+def create_cat_with_caretaker_id(caretaker_id):
+    caretaker = validate_model(Caretaker,caretaker_id)
+    request_body = request.get_json()
+    request_body["caretaker_id"] = caretaker.id
+
+    try:
+        new_cat= Cat.from_dict(request_body)
+
+    except KeyError as error:
+        response = {"message": f"Invalid request:missing {error.args[0]}"}
+        abort(make_response(response, 400))
+
+    db.session.add(new_cat)
+    db.session.commit()
+
+    return new_cat.to_dict, 201
